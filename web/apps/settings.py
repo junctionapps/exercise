@@ -15,18 +15,10 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
-
 SECRET_KEY = os.environ['DJANGO_SECRET']
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('DJANGO_DEBUG', False))
 
 ALLOWED_HOSTS = os.environ['DJANGO_ALLOWED_HOSTS'].split()
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -35,6 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sitetree',
+    'appscommon',
 ]
 
 MIDDLEWARE = [
@@ -45,6 +39,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'appscommon.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'apps.urls'
@@ -52,7 +47,7 @@ ROOT_URLCONF = 'apps.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,11 +60,14 @@ TEMPLATES = [
     },
 ]
 
+SITE_NAME = os.environ["DJANGO_PROJECT_NAME"]
 WSGI_APPLICATION = 'apps.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+LOGIN_URL = '/accounts/login/'
+LOGIN_EXEMPT_URLS = (
+    r'^legal/',             # allow any URL under /legal/*
+    r'^accounts/',          # allow access to the accounts login
+)
+LOGIN_REDIRECT_URL = '/'
 
 DATABASES = {
     'default': {
@@ -81,7 +79,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
-
+AUTH_USER_MODEL = 'appscommon.User'
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -102,17 +100,25 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
+STATIC_URL = '/s/'
+# assumes static root is one level up in folder with the project name
+# alter as necessary if this is not the pattern
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), os.environ['DJANGO_STATIC_ROOT'])
 
-STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+# assumes media root is one level up in folder with the project name
+# alter as necessary if this is not the pattern
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), os.environ['DJANGO_MEDIA_ROOT'])
+MEDIA_URL = '/media/'
+
+# Tree Item Override to get glyphicons
+SITETREE_MODEL_TREE_ITEM = 'appscommon.CustomTreeItem'

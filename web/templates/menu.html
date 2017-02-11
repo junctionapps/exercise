@@ -1,0 +1,12 @@
+{% load sitetree %}
+
+{% for item in sitetree_items %}
+    <li {% if item.is_current or item.in_current_branch %}class="active"{% endif %}>
+        <a href="{% sitetree_url for item %}"><i class="{{ item.icon }}"></i> <span class="nav-label">{{ item.title_resolved }}</span> {% if item.has_children %}<span class="fa arrow"></span>{% endif %}</a>
+    {% if item.has_children %}
+
+            {% sitetree_children of item for menu template "menu_dropdown.html" %}
+
+    {% endif %}
+    </li>
+{% endfor %}

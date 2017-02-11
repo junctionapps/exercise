@@ -1,0 +1,185 @@
+{% load static %}
+{% load sitetree %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ app_name }} | Empty Page</title>
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'font-awesome/css/font-awesome.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+
+    <!-- c3 Charts -->
+    <link href="{% static 'css/plugins/c3/c3.min.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+</head>
+
+<body class="">
+
+    <div id="wrapper">
+
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="profile-element">
+                        <span><img alt="image" width="72" height="72" class="img-circle" src="{% static 'img/amg.png' %}" /></span>
+                        <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ request.user.username }}</strong></span>
+                    </div>
+                    <div class="logo-element">
+                        {{ app_short_name }}
+                    </div>
+                </li>
+                {% sitetree_menu from "maintree" include "trunk" template "menu.html" %}
+            </ul>
+        </div>
+    </nav>
+
+        <div id="page-wrapper" class="gray-bg">
+        <div class="row border-bottom">
+        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <form role="search" class="navbar-form-custom" action="search_results.html">
+                <div class="form-group">
+                    <input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">
+                </div>
+            </form>
+        </div>
+            <ul class="nav navbar-top-links navbar-right">
+                <li>
+                    <span class="m-r-sm text-muted welcome-message">{{ app_name }}</span>
+                </li>
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                        <i class="fa fa-cog"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-messages">
+                        <li>
+                            <div class="text-center link-block">
+                                <a href="{% url 'auth_logout' %}?next={% url 'auth_login' %}">
+                                    <i class="fa fa-sign-out"></i> <strong>Logout</strong>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        </div>
+        {% block page-heading %}
+            <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-sm-4">
+                    <h2>{{ app_name }}</h2>
+                    {{ sitetree_items }}<br />
+                    {% sitetree_breadcrumbs from "maintree" template "breadcrumbs.html"  %}
+                </div>
+                <div class="col-sm-8">
+                    {% if cta_show %}
+                    <div class="title-action">
+                        <a href="#" class="btn btn-primary">{{ cta_label }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endblock %}
+        {% block wrapper_content %}
+            <div class="wrapper wrapper-content">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Days in Canada in the past 6 years</h5><br/>
+
+                            </div>
+                            <div class="ibox-content">
+                                <div>
+                                    <div id="gauge"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+            <div class="footer">
+                <div>
+                    <strong>JUNCTION </strong>Applications <strong>{% now "Y" %}</strong>
+                </div>
+            </div>
+
+        </div>
+        </div>
+
+    <!-- Mainly scripts -->
+    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
+    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="{% static 'js/inspinia.js' %}"></script>
+    <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
+
+
+    <!-- d3 and c3 charts -->
+    <script src="{% static 'js/plugins/d3/d3.min.js' %}"></script>
+    <script src="{% static 'js/plugins/c3/c3.min.js' %}"></script>
+
+ <script>
+
+        $(document).ready(function () {
+ var chart = c3.generate({
+    bindto: '#gauge',
+
+    data: {
+        columns: [
+            ['In Canada', 350]
+        ],
+        type: 'gauge',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    },
+    gauge: {
+        label: {
+              format: function(value, ratio) {
+                  return value;
+              },
+              //show: false // to turn off the min/max labels.
+          },
+//    min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
+    max: 1460, // 100 is default
+    units: ' days',
+//    width: 39 // for adjusting arc thickness
+    },
+    color: {
+        pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], // the three color levels for the percentage values.
+        threshold: {
+//            unit: 'value', // percentage is default
+//            max: 200, // 100 is default
+            values: [180, 720, 1080, 1440]
+        }
+    },
+    size: {
+        height: 140
+    }
+});
+
+
+
+        });
+
+    </script>
+
+</body>
+</html>
